@@ -58,7 +58,7 @@ export class UserService {
 
     return {
       accessToken, email: user.email, role: user.role, fullName: user.name,
-      isActive: user.isActive,userId:user.id
+      isActive: user.isActive,userId:user.id,user_permissions:user.permissions
     };
   }
 

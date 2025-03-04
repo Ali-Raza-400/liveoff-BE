@@ -138,8 +138,6 @@ export class ProductController {
 
   //product stats counts
   @Get('stats/count')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get product count' })
   @ApiResponse({ status: 200, description: 'Product count fetched successfully' })
   getProductCount() {
