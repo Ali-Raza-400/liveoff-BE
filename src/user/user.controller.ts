@@ -12,7 +12,7 @@ import { UserRole } from './enums/role.enum';
 import { Roles } from 'src/custom-decorators/role_decorator';
 
 @ApiTags('User Management')
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 

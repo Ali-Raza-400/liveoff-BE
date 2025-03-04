@@ -38,6 +38,7 @@ export class UserService {
   async login(loginDto: LoginDto) {
     const user = await this.userRepository.findOne({ where: { email: loginDto.email } });
 
+
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -51,10 +52,14 @@ export class UserService {
       sub: user.id,          // This should be 'sub', not 'userId'
       email: user.email,
       role: user.role,
+
     };
     const accessToken = this.jwtService.sign(payload);
 
-    return { accessToken };
+    return {
+      accessToken, email: user.email, role: user.role, fullName: user.name,
+      isActive: user.isActive,userId:user.id
+    };
   }
 
   logout() {
