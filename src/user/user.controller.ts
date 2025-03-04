@@ -81,6 +81,16 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)  // Requires valid JWT + admin role check
   @Roles(UserRole.ADMIN)  // This is the custom role check
   async deleteUser(@Param('id') id: string) {
-      return this.userService.remove(id);
+    return this.userService.remove(id);
   }
+  
+  //get user count 
+  @Get('stats/count')
+  // @ApiBearerAuth() 
+  @ApiOperation({ summary: 'Get user count' })
+  @ApiResponse({ status: 200, description: 'User count fetched successfully' })
+  async getUserCount() {
+    return this.userService.getUserCount();
+  }
+
 }

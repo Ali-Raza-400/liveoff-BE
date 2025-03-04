@@ -128,4 +128,14 @@ export class CouponController {
   findActiveAndValid(): Promise<CouponResponseDto[]> {
     return this.couponService.findActiveAndValid();
   }
+
+  // get stats count
+  @Get('stats/count')
+  @ApiOperation({ summary: 'Get coupon count' })
+  @ApiResponse({ status: 200, description: 'Coupon count fetched successfully' })
+  async getCouponCount() {
+    return this.couponService.getCouponCount();
+  }
+  
+
 }

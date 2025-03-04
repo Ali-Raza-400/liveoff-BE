@@ -135,4 +135,14 @@ export class ProductController {
   remove(@Param('id') id: string, @Request() req) {
     return this.productService.remove(id, req.user.id, req.user.role);
   }
+
+  //product stats counts
+  @Get('stats/count')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get product count' })
+  @ApiResponse({ status: 200, description: 'Product count fetched successfully' })
+  getProductCount() {
+    return this.productService.getProductCount();
+  }
 }

@@ -17,7 +17,7 @@ export class CouponService {
     private productRepository: Repository<Product>,
     @InjectRepository(Store)
     private storeRepository: Repository<Store>,
-  ) {}
+  ) { }
 
   async create(createCouponDto: CreateCouponDto, userId: string): Promise<CouponResponseDto> {
     // Check if store exists
@@ -39,54 +39,54 @@ export class CouponService {
       const products = await this.productRepository.find({
         where: { id: In(createCouponDto.productIds) }
       });
-      
+
       if (products.length !== createCouponDto.productIds.length) {
         throw new BadRequestException('One or more product IDs are invalid');
       }
-      
+
       coupon.products = products;
     }
 
     // Save the coupon
     const savedCoupon = await this.couponRepository.save(coupon);
-    
+
     // Return formatted response
     return CouponResponseDto.fromEntity(savedCoupon);
   }
 
   async findAll(
-    storeId?: string, 
-    isActive?: boolean, 
+    storeId?: string,
+    isActive?: boolean,
     category?: string,
     isVerified?: boolean
   ): Promise<CouponResponseDto[]> {
     const queryBuilder = this.couponRepository.createQueryBuilder('coupon')
       .leftJoinAndSelect('coupon.store', 'store')
       .leftJoinAndSelect('coupon.products', 'products');
-    
+
     // Apply filters if provided
     if (storeId) {
       queryBuilder.andWhere('coupon.storeId = :storeId', { storeId });
     }
-    
+
     if (isActive !== undefined) {
       queryBuilder.andWhere('coupon.isActive = :isActive', { isActive });
     }
-    
+
     if (category) {
       queryBuilder.andWhere('coupon.category = :category', { category });
     }
-    
+
     if (isVerified !== undefined) {
       queryBuilder.andWhere('coupon.isVerified = :isVerified', { isVerified });
     }
-    
+
     // Order by rank and creation date
     queryBuilder.orderBy('coupon.rank', 'DESC')
       .addOrderBy('coupon.createdAt', 'DESC');
-    
+
     const coupons = await queryBuilder.getMany();
-    
+
     return coupons.map(coupon => CouponResponseDto.fromEntity(coupon));
   }
 
@@ -95,11 +95,11 @@ export class CouponService {
       where: { id },
       relations: ['store', 'products']
     });
-    
+
     if (!coupon) {
       throw new NotFoundException(`Coupon with ID ${id} not found`);
     }
-    
+
     return CouponResponseDto.fromEntity(coupon);
   }
 
@@ -108,46 +108,46 @@ export class CouponService {
       where: { id },
       relations: ['products']
     });
-    
+
     if (!coupon) {
       throw new NotFoundException(`Coupon with ID ${id} not found`);
     }
-    
+
     // Handle date conversions if provided
     if (updateCouponDto.startDate) {
       updateCouponDto.startDate = new Date(updateCouponDto.startDate).toISOString();
     }
-    
+
     if (updateCouponDto.endDate) {
       updateCouponDto.endDate = new Date(updateCouponDto.endDate).toISOString();
     }
-    
+
     // Handle product associations if provided
     if (updateCouponDto.productIds) {
       const products = await this.productRepository.find({
         where: { id: In(updateCouponDto.productIds) }
       });
-      
+
       if (products.length !== updateCouponDto.productIds.length) {
         throw new BadRequestException('One or more product IDs are invalid');
       }
-      
+
       coupon.products = products;
-      
+
       // Remove productIds from DTO as it's not a direct column
       delete updateCouponDto.productIds;
     }
-    
+
     // Update the coupon
     Object.assign(coupon, updateCouponDto);
-    
+
     const updatedCoupon = await this.couponRepository.save(coupon);
     return CouponResponseDto.fromEntity(updatedCoupon);
   }
 
   async remove(id: string): Promise<void> {
     const result = await this.couponRepository.delete(id);
-    
+
     if (result.affected === 0) {
       throw new NotFoundException(`Coupon with ID ${id} not found`);
     }
@@ -159,7 +159,7 @@ export class CouponService {
       relations: ['products'],
       order: { rank: 'DESC', createdAt: 'DESC' }
     });
-    
+
     return coupons.map(coupon => CouponResponseDto.fromEntity(coupon));
   }
 
@@ -172,13 +172,13 @@ export class CouponService {
       .orderBy('coupon.rank', 'DESC')
       .addOrderBy('coupon.createdAt', 'DESC')
       .getMany();
-    
+
     return coupons.map(coupon => CouponResponseDto.fromEntity(coupon));
   }
 
   async findActiveAndValid(): Promise<CouponResponseDto[]> {
     const now = new Date();
-    
+
     const coupons = await this.couponRepository
       .createQueryBuilder('coupon')
       .leftJoinAndSelect('coupon.store', 'store')
@@ -189,7 +189,13 @@ export class CouponService {
       .orderBy('coupon.rank', 'DESC')
       .addOrderBy('coupon.createdAt', 'DESC')
       .getMany();
-    
+
     return coupons.map(coupon => CouponResponseDto.fromEntity(coupon));
   }
+
+  async getCouponCount() {
+    const count = await this.couponRepository.count();
+    return { count };
+  }
+
 }

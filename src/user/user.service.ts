@@ -104,4 +104,9 @@ export class UserService {
     await this.userRepository.delete(id);
     return { message: `User with id ${id} deleted successfully` };
   }
+
+    async getUserCount() {
+      const count = await this.userRepository.count();
+      return { count };
+    }
 }

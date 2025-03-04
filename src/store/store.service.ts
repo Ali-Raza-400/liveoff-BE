@@ -71,4 +71,9 @@ export class StoreService {
     
     await this.storeRepository.delete(id);
   }
+
+  async getStoreCount() {
+    const count = await this.storeRepository.count();
+    return { count };
+  }
 }

@@ -12,22 +12,22 @@ export class ProductService {
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
     private storeService: StoreService,
-  ) {}
+  ) { }
 
   async create(createProductDto: CreateProductDto, userId: string): Promise<Product> {
     // Verify that the store exists and the user has access to it
     const store = await this.storeService.findOne(createProductDto.storeId);
-    
+
     // Check if the user is the owner of the store or an admin
     if (store.userId !== userId) {
       throw new ForbiddenException('You do not have permission to add products to this store');
     }
-    
+
     const product = this.productRepository.create({
       ...createProductDto,
       userId,
     });
-    
+
     return this.productRepository.save(product);
   }
 
@@ -56,22 +56,22 @@ export class ProductService {
       where: { id },
       relations: ['store', 'user'],
     });
-    
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    
+
     return product;
   }
 
   async update(id: string, updateProductDto: UpdateProductDto, userId: string, userRole: string): Promise<Product> {
     const product = await this.findOne(id);
-    
+
     // Check if the user is the owner of the product or an admin
     if (product.userId !== userId && userRole !== 'admin') {
       throw new ForbiddenException('You do not have permission to update this product');
     }
-    
+
     // If storeId is being updated, verify the user has access to the new store
     if (updateProductDto.storeId && updateProductDto.storeId !== product.storeId) {
       const newStore = await this.storeService.findOne(updateProductDto.storeId);
@@ -79,20 +79,20 @@ export class ProductService {
         throw new ForbiddenException('You do not have permission to move this product to the specified store');
       }
     }
-    
+
     await this.productRepository.update(id, updateProductDto);
-    
+
     return this.findOne(id);
   }
 
   async remove(id: string, userId: string, userRole: string): Promise<void> {
     const product = await this.findOne(id);
-    
+
     // Check if the user is the owner of the product or an admin
     if (product.userId !== userId && userRole !== 'admin') {
       throw new ForbiddenException('You do not have permission to delete this product');
     }
-    
+
     await this.productRepository.delete(id);
   }
 
@@ -108,5 +108,10 @@ export class ProductService {
       where: { category, isActive: true },
       relations: ['store'],
     });
+  }
+
+  async getProductCount() {
+    const count = await this.productRepository.count();
+    return { count };
   }
 }
