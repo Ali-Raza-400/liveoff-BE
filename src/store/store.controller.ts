@@ -117,4 +117,15 @@ export class StoreController {
     return this.storeService.getStoreCount();
   }
 
+  @Get('coupon-product/:storeId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get store details along with associated coupons and products' })
+  @ApiParam({ name: 'storeId', description: 'Store ID' })
+  @ApiResponse({ status: 200, description: 'Store with coupons and products returned successfully' })
+  @ApiResponse({ status: 404, description: 'Store not found' })
+  async getStoreWithCouponsAndProducts(@Param('storeId') storeId: string) {
+    return this.storeService.getStoreWithCouponsAndProducts(storeId);
+  }
+
+
 }

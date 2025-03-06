@@ -17,7 +17,7 @@ export class StoreService {
       ...createStoreDto,
       userId,
     });
-    console.log("store:::",store)
+    console.log("store:::", store);
     
     return this.storeRepository.save(store);
   }
@@ -76,4 +76,20 @@ export class StoreService {
     const count = await this.storeRepository.count();
     return { count };
   }
+
+  async getStoreWithCouponsAndProducts(storeId: string) {
+    const store = await this.storeRepository.findOne({
+        where: { id: storeId },
+        relations: ['coupons', 'products'],  // Add these relations
+    });
+
+    if (!store) {
+        throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
+
+    return {
+        store
+    };
+}
+
 }

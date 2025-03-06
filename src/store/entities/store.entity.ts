@@ -149,6 +149,31 @@ export class Store {
     @Column({ default: true })
     isActive: boolean;
 
+    // New SEO Fields
+    @ApiProperty({
+        description: 'Meta description for SEO',
+        example: 'Find the best deals at My Awesome Store. Shop now for exclusive offers.',
+        nullable: true
+    })
+    @Column({ nullable: true })
+    metaDescription: string;
+
+    @ApiProperty({
+        description: 'Store description for SEO',
+        example: 'My Awesome Store offers a wide range of products at competitive prices.',
+        nullable: true
+    })
+    @Column({ nullable: true })
+    storeDescription: string;
+
+    @ApiProperty({
+        description: 'HTML content for the store article/description',
+        example: '<p>Welcome to our store. We offer the best products...</p>',
+        nullable: true
+    })
+    @Column({ type: 'text', nullable: true })
+    storeArticle: string;
+
     @ApiProperty({
         description: 'Date when the store was created',
         example: '2023-01-01T00:00:00Z'
