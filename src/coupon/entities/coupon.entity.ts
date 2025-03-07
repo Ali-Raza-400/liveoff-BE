@@ -3,6 +3,7 @@ import { User } from '../../user/entities/user.entity';
 import { Store } from '../../store/entities/store.entity';
 import { Product } from '../../product/entities/product.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity()
 export class Coupon {
@@ -188,4 +189,12 @@ export class Coupon {
         inverseJoinColumn: { name: 'productId', referencedColumnName: 'id' }
     })
     products: Product[];
+
+    @ManyToOne(() => Category, category => category.coupons)
+    @JoinColumn({ name: 'categoryId' })
+    categoryEntity: Category;
+
+    @Column({ nullable: true })
+    categoryId: string;
+
 }

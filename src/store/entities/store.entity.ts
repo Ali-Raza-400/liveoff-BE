@@ -3,6 +3,23 @@ import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Coupon } from '../../coupon/entities/coupon.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Network } from 'src/network/entities/network.entity';
+import { Category } from 'src/category/entities/category.entity';
+
+// Define a class for FAQ items
+export class FAQ {
+    @ApiProperty({
+        description: 'The question for the FAQ',
+        example: 'How do I return an item?'
+    })
+    question: string;
+
+    @ApiProperty({
+        description: 'The answer to the FAQ question',
+        example: 'You can return items within 30 days of purchase by visiting our returns page.'
+    })
+    answer: string;
+}
 
 @Entity()
 export class Store {
@@ -174,6 +191,25 @@ export class Store {
     @Column({ type: 'text', nullable: true })
     storeArticle: string;
 
+    // New FAQ field
+    @ApiProperty({
+        description: 'Frequently Asked Questions for the store',
+        example: [
+            {
+                question: 'How do I return an item?',
+                answer: 'You can return items within 30 days of purchase by visiting our returns page.'
+            },
+            {
+                question: 'Do you offer international shipping?',
+                answer: 'Yes, we ship to most countries worldwide. Shipping costs vary by location.'
+            }
+        ],
+        nullable: true,
+        type: [FAQ]
+    })
+    @Column('json', { nullable: true, default: '[]' })
+    faqs: FAQ[];
+
     @ApiProperty({
         description: 'Date when the store was created',
         example: '2023-01-01T00:00:00Z'
@@ -207,4 +243,20 @@ export class Store {
     // Relationship with Coupons - one store can have many coupons
     @OneToMany(() => Coupon, coupon => coupon.store)
     coupons: Coupon[];
+
+    @ManyToOne(() => Network, (network) => network.stores, { nullable: true })
+    @JoinColumn({ name: 'networkId' })
+    networkEntity: Network;
+
+    @Column({ nullable: true })
+    networkId: string;
+
+    @ManyToOne(() => Category, category => category.stores)
+    @JoinColumn({ name: 'categoryId' })
+    category: Category;
+
+    @Column({ nullable: true })
+    categoryId: string;
+
+
 }

@@ -3,6 +3,7 @@ import { Store } from '../../store/entities/store.entity';
 import { User } from '../../user/entities/user.entity';
 import { Coupon } from '../../coupon/entities/coupon.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity()
 export class Product {
@@ -158,4 +159,12 @@ export class Product {
 
     @ManyToMany(() => Coupon, coupon => coupon.products)
     coupons: Coupon[];
+
+    @ManyToOne(() => Category, category => category.products)
+    @JoinColumn({ name: 'categoryId' })
+    categoryEntity: Category;
+
+    @Column({ nullable: true })
+    categoryId: string;
+
 }

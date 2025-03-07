@@ -1,7 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { CreateStoreDto } from './create-store.dto';
-import { IsNotEmpty, IsString, IsOptional, IsBoolean, IsArray, IsUUID } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { CreateStoreDto, FAQDto } from './create-store.dto';
+import { IsNotEmpty, IsString, IsOptional, IsBoolean, IsArray, IsUUID, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateStoreDto extends PartialType(CreateStoreDto) {
     @ApiPropertyOptional({
@@ -107,4 +108,25 @@ export class UpdateStoreDto extends PartialType(CreateStoreDto) {
         default: true
     })
     isActive?: boolean;
+    // New FAQs field
+      @ApiProperty({
+        description: 'Frequently Asked Questions for the store',
+        example: [
+          {
+            question: 'How do I return an item?',
+            answer: 'You can return items within 30 days of purchase by visiting our returns page.'
+          },
+          {
+            question: 'Do you offer international shipping?',
+            answer: 'Yes, we ship to most countries worldwide. Shipping costs vary by location.'
+          }
+        ],
+        required: false,
+        type: [FAQDto]
+      })
+      @IsOptional()
+      @IsArray()
+      @ValidateNested({ each: true })
+      @Type(() => FAQDto)
+      faqs?: FAQDto[];
 }

@@ -1,5 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsBoolean, IsArray, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, IsUrl, ValidateNested, IsObject } from 'class-validator';
+import { Type } from 'class-transformer';
+
+// Create a DTO for FAQ items
+export class FAQDto {
+  @ApiProperty({
+    description: 'The question for the FAQ',
+    example: 'How do I return an item?'
+  })
+  @IsString()
+  question: string;
+
+  @ApiProperty({
+    description: 'The answer to the FAQ question',
+    example: 'You can return items within 30 days of purchase by visiting our returns page.'
+  })
+  @IsString()
+  answer: string;
+}
 
 export class CreateStoreDto {
   @ApiProperty({
@@ -186,4 +204,26 @@ export class CreateStoreDto {
   @IsOptional()
   @IsString()
   storeArticle?: string;
+
+  // New FAQs field
+  @ApiProperty({
+    description: 'Frequently Asked Questions for the store',
+    example: [
+      {
+        question: 'How do I return an item?',
+        answer: 'You can return items within 30 days of purchase by visiting our returns page.'
+      },
+      {
+        question: 'Do you offer international shipping?',
+        answer: 'Yes, we ship to most countries worldwide. Shipping costs vary by location.'
+      }
+    ],
+    required: false,
+    type: [FAQDto]
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FAQDto)
+  faqs?: FAQDto[];
 }
