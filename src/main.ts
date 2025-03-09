@@ -11,7 +11,7 @@ const app = express();
 async function bootstrap() {
   const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(app));
 
-  // ✅ Enable CORS
+  // ✅ Enable CORS for all origins
   nestApp.enableCors({
     origin: '*',
     credentials: true,
@@ -19,12 +19,14 @@ async function bootstrap() {
   });
 
   // ✅ Enable Validation Globally
-  nestApp.useGlobalPipes(new ValidationPipe({ 
-    whitelist: true, 
-    forbidNonWhitelisted: true 
-  }));
+  nestApp.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    })
+  );
 
-  // ✅ Swagger Configuration
+  // ✅ Swagger Configuration (for API documentation)
   const config = new DocumentBuilder()
     .setTitle('LifeOff API')
     .setDescription('API Documentation for my NestJS application')
