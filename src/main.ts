@@ -2,45 +2,39 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import * as express from 'express';
-import * as serverless from 'serverless-http';
-
-const app = express();
 
 async function bootstrap() {
-  const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(app));
+  const app = await NestFactory.create(AppModule);
 
-  // ✅ Enable CORS for all origins
-  nestApp.enableCors({
+  // Enable CORS
+  app.enableCors({
     origin: '*',
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
 
-  // ✅ Enable Validation Globally
-  nestApp.useGlobalPipes(
+  // Enable Validation
+  app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
     })
   );
 
-  // ✅ Swagger Configuration (for API documentation)
+  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('LifeOff API')
-    .setDescription('API Documentation for my NestJS application')
+    .setDescription('API Documentation')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(nestApp, config);
-  SwaggerModule.setup('api/docs', nestApp, document);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
-  await nestApp.init();
+  // Start the server on port 3000
+  await app.listen(3000);
+  console.log('Server running on http://localhost:3000');
 }
 
-// ✅ Export serverless handler for Vercel
-bootstrap().then(() => {
-  module.exports = serverless(app);
-});
+bootstrap();
