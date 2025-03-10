@@ -6,35 +6,30 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS
+  // ✅ Enable CORS for localhost:5173
   app.enableCors({
     origin: '*',
-    credentials: true,
+    credentials: true, // Allow cookies & authentication headers
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
 
-  // Enable Validation
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    })
-  );
+  // ✅ Enable Validation Globally
+  app.useGlobalPipes(new ValidationPipe({ 
+    whitelist: true, 
+    forbidNonWhitelisted: true 
+  }));
 
-  // Swagger setup
+  // ✅ Swagger Configuration
   const config = new DocumentBuilder()
-    .setTitle('LifeOff API')
-    .setDescription('API Documentation')
+    .setTitle('LifeOff website ')
+    .setDescription('API Documentation for my NestJS application')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth() // Enables JWT authentication in Swagger
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document); // Set the Swagger endpoint
 
-  // Start the server on port 3000
-  await app.listen(3000);
-  console.log('Server running on http://localhost:3000');
+  await app.listen(process.env.PORT ?? 3000);
 }
-
 bootstrap();
