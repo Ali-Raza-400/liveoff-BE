@@ -4,6 +4,7 @@ import { Store } from '../../store/entities/store.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Coupon } from '../../coupon/entities/coupon.entity';
 import { Network } from '../../network/entities/network.entity';
+import { Blog } from 'src/blogs/entities/blog.entity';
 
 @Entity()
 export class Category {
@@ -45,4 +46,7 @@ export class Category {
 
     @OneToMany(() => Coupon, coupon => coupon.categoryEntity)
     coupons: Coupon[];
+
+    @OneToMany(() => Blog, blog => blog.category)
+    blogs: Blog[];
 }

@@ -9,9 +9,10 @@ import { ProductModule } from './product/product.module';
 import { CouponModule } from './coupon/coupon.module';
 import { NetworkModule } from './network/network.module';
 import { CategoryModule } from './category/category.module';
+import { BlogsModule } from './blogs/blogs.module';
 
 @Module({
-  imports: [UserModule,DatabaseModule, ConfigModule.forRoot({ isGlobal: true }), StoreModule, ProductModule, CouponModule, NetworkModule, CategoryModule,],
+  imports: [UserModule,DatabaseModule, ConfigModule.forRoot({ isGlobal: true }), StoreModule, ProductModule, CouponModule, NetworkModule, CategoryModule, BlogsModule,],
   controllers: [AppController],
   providers: [AppService],
 })
