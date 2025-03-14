@@ -4,6 +4,7 @@ import { Store } from '../../store/entities/store.entity';
 import { Product } from '../../product/entities/product.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
+import { Event } from 'src/events/entities/event.entity';
 
 @Entity()
 export class Coupon {
@@ -196,5 +197,8 @@ export class Coupon {
 
     @Column({ nullable: true })
     categoryId: string;
+
+    @ManyToMany(() => Event, (event) => event.coupons)
+    events: Event[];
 
 }

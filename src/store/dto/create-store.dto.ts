@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsBoolean, IsArray, IsUrl, ValidateNested, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, IsUrl, ValidateNested, IsObject, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 
 // Create a DTO for FAQ items
@@ -226,4 +226,9 @@ export class CreateStoreDto {
   @ValidateNested({ each: true })
   @Type(() => FAQDto)
   faqs?: FAQDto[];
+
+  @ApiProperty({ description: 'List of event IDs', isArray: true })
+  @IsUUID(undefined, { each: true })
+  @IsOptional()
+  eventIds?: string[];
 }

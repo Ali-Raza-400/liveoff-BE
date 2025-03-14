@@ -175,4 +175,10 @@ export class CreateCouponDto {
     @IsUUID('4', { each: true })
     @IsOptional()
     productIds?: string[];
+
+    
+    @ApiProperty({ description: 'List of associated event IDs', isArray: true })
+    @IsUUID(undefined, { each: true })
+    @IsOptional()
+    eventIds?: string[];
 }

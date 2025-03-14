@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, ManyToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Coupon } from '../../coupon/entities/coupon.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Network } from 'src/network/entities/network.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { Event } from 'src/events/entities/event.entity';
 
 // Define a class for FAQ items
 export class FAQ {
@@ -257,6 +258,10 @@ export class Store {
 
     @Column({ nullable: true })
     categoryId: string;
+
+    @ApiProperty({ description: 'List of events this store is part of' })
+    @ManyToMany(() => Event, (event) => event.stores)
+    events: Event[];
 
 
 }

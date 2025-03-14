@@ -5,6 +5,7 @@ import { Blog } from './entities/blog.entity';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { Category } from '../category/entities/category.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class BlogsService {
@@ -13,41 +14,34 @@ export class BlogsService {
         private readonly blogRepository: Repository<Blog>,
         @InjectRepository(Category)
         private readonly categoryRepository: Repository<Category>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
     ) {}
 
     async create(createBlogDto: CreateBlogDto): Promise<Blog> {
-        const category = await this.categoryRepository.findOne({ 
-            where: { id: createBlogDto.categoryId }
-        });
-        
-        if (!category) {
-            throw new NotFoundException('Category not found');
-        }
-
+        const category = await this.categoryRepository.findOne({ where: { id: createBlogDto.categoryId } });
+        if (!category) throw new NotFoundException('Category not found');
+    
+        const author = await this.userRepository.findOne({ where: { id: createBlogDto.author } });
+        if (!author) throw new NotFoundException('Author not found');
+    
         const blog = this.blogRepository.create({
             ...createBlogDto,
             category,
+            author: Promise.resolve(author), // 👈 Wrap author in Promise.resolve()
         });
-
-        return this.blogRepository.save(blog);
+    
+        return this.blogRepository.save(await blog); // 👈 Await before saving
     }
+    
 
     async findAll(): Promise<Blog[]> {
-        return this.blogRepository.find({
-            relations: ['category'],
-        });
+        return this.blogRepository.find({ relations: ['category', 'author'] });
     }
 
     async findOne(id: string): Promise<Blog> {
-        const blog = await this.blogRepository.findOne({
-            where: { id },
-            relations: ['category'],
-        });
-
-        if (!blog) {
-            throw new NotFoundException('Blog not found');
-        }
-
+        const blog = await this.blogRepository.findOne({ where: { id }, relations: ['category', 'author'] });
+        if (!blog) throw new NotFoundException('Blog not found');
         return blog;
     }
 
@@ -55,12 +49,8 @@ export class BlogsService {
         const blog = await this.findOne(id);
 
         if (updateBlogDto.categoryId) {
-            const category = await this.categoryRepository.findOne({
-                where: { id: updateBlogDto.categoryId }
-            });
-            if (!category) {
-                throw new NotFoundException('Category not found');
-            }
+            const category = await this.categoryRepository.findOne({ where: { id: updateBlogDto.categoryId } });
+            if (!category) throw new NotFoundException('Category not found');
             blog.category = category;
         }
 
@@ -76,23 +66,31 @@ export class BlogsService {
     async getFeaturedBlogs(): Promise<Blog[]> {
         return this.blogRepository.find({
             where: { isFeatured: true },
-            relations: ['category'],
+            relations: ['category', 'author'],
         });
+    }
+
+    async setFeaturedBlog(id: string, isFeatured: boolean): Promise<Blog> {
+        const blog = await this.findOne(id);
+        blog.isFeatured = isFeatured;
+        return this.blogRepository.save(blog);
     }
 
     async getTrendingBlogs(): Promise<Blog[]> {
         return this.blogRepository.find({
             where: { isTrending: true },
-            relations: ['category'],
-            order: { viewCount: 'DESC' },
+            relations: ['category', 'author'], // Include related data
+            order: { viewCount: 'DESC' }, // Sort by views (optional)
         });
     }
 
     async getLatestBlogs(): Promise<Blog[]> {
         return this.blogRepository.find({
             where: { isLatest: true },
-            relations: ['category'],
-            order: { createdAt: 'DESC' },
+            relations: ['category', 'author'], // Include category & author details
+            order: { createdAt: 'DESC' }, // Sort by newest first
         });
     }
+    
+
 }

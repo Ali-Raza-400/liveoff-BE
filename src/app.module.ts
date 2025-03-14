@@ -10,9 +10,10 @@ import { CouponModule } from './coupon/coupon.module';
 import { NetworkModule } from './network/network.module';
 import { CategoryModule } from './category/category.module';
 import { BlogModule } from './blogs/blogs.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
-  imports: [UserModule,DatabaseModule, ConfigModule.forRoot({ isGlobal: true }), StoreModule, ProductModule, CouponModule, NetworkModule, CategoryModule, BlogModule,],
+  imports: [UserModule,DatabaseModule, ConfigModule.forRoot({ isGlobal: true }), StoreModule, ProductModule, CouponModule, NetworkModule, CategoryModule, BlogModule, EventsModule,],
   controllers: [AppController],
   providers: [AppService],
 })

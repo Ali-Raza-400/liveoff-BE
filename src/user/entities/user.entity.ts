@@ -3,6 +3,7 @@ import { Store } from '../../store/entities/store.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Coupon } from '../../coupon/entities/coupon.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Blog } from '../../blogs/entities/blog.entity';
 
 @Entity()
 export class User {
@@ -87,4 +88,8 @@ export class User {
     // Relationship with Coupon - one user can create many coupons
     @OneToMany(() => Coupon, coupon => coupon.user)
     coupons: Coupon[];
+
+    @ApiProperty({ description: 'Blogs created by the user' })
+    @OneToMany(() => Blog, (blog) => blog.author, { lazy: true }) // Lazy relation
+    blogs: Promise<Blog[]>;
 }

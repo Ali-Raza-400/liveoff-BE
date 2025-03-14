@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '../../category/entities/category.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity()
 export class Blog {
@@ -28,6 +29,10 @@ export class Blog {
     @Column({ default: false })
     isFeatured: boolean;
 
+    @ApiProperty({ description: 'Date and time when the blog was featured', nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
+    featuredAt: Date | null; // Track when the blog was featured
+
     @ApiProperty({ description: 'Whether the blog post is trending' })
     @Column({ default: false })
     isTrending: boolean;
@@ -48,4 +53,8 @@ export class Blog {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @ApiProperty({ description: 'User who created the blog' })
+    @ManyToOne(() => User, (user) => user.blogs, { lazy: true, nullable: false }) // Lazy relation
+    author: Promise<User>;
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Delete, Body } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
@@ -8,7 +8,7 @@ import { Blog } from './entities/blog.entity';
 @ApiTags('blogs')
 @Controller('blogs')
 export class BlogController {
-    constructor(private readonly blogService: BlogsService) {}
+    constructor(private readonly blogService: BlogsService) { }
 
     @Post()
     @ApiOperation({ summary: 'Create a new blog post' })
@@ -31,44 +31,45 @@ export class BlogController {
         return this.blogService.getFeaturedBlogs();
     }
 
-    @Get('trending')
-    @ApiOperation({ summary: 'Get trending blog posts' })
-    @ApiResponse({ status: 200, description: 'Returns trending blog posts', type: [Blog] })
-    getTrendingBlogs() {
-        return this.blogService.getTrendingBlogs();
-    }
-
-    @Get('latest')
-    @ApiOperation({ summary: 'Get latest blog posts' })
-    @ApiResponse({ status: 200, description: 'Returns latest blog posts', type: [Blog] })
-    getLatestBlogs() {
-        return this.blogService.getLatestBlogs();
+    @Post(':id/feature')
+    @ApiOperation({ summary: 'Mark a blog as featured' })
+    @ApiResponse({ status: 200, description: 'Blog post marked as featured', type: Blog })
+    setFeaturedBlog(@Param('id') id: string, @Body() { isFeatured }: { isFeatured: boolean }) {
+        return this.blogService.setFeaturedBlog(id, isFeatured);
     }
 
     @Get(':id')
     @ApiOperation({ summary: 'Get a blog post by ID' })
     @ApiParam({ name: 'id', description: 'Blog post ID' })
     @ApiResponse({ status: 200, description: 'Returns a blog post', type: Blog })
-    @ApiResponse({ status: 404, description: 'Blog post not found' })
     findOne(@Param('id') id: string) {
         return this.blogService.findOne(id);
     }
 
     @Patch(':id')
     @ApiOperation({ summary: 'Update a blog post' })
-    @ApiParam({ name: 'id', description: 'Blog post ID' })
-    @ApiResponse({ status: 200, description: 'Blog post updated successfully', type: Blog })
-    @ApiResponse({ status: 404, description: 'Blog post not found' })
     update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
         return this.blogService.update(id, updateBlogDto);
     }
 
     @Delete(':id')
     @ApiOperation({ summary: 'Delete a blog post' })
-    @ApiParam({ name: 'id', description: 'Blog post ID' })
-    @ApiResponse({ status: 200, description: 'Blog post deleted successfully' })
-    @ApiResponse({ status: 404, description: 'Blog post not found' })
     remove(@Param('id') id: string) {
         return this.blogService.remove(id);
     }
+
+    @Get('trending')
+    @ApiOperation({ summary: 'Get trending blog posts' })
+    @ApiResponse({ status: 200, description: 'Returns trending blog posts', type: [Blog] })
+    async getTrendingBlogs() {
+        return this.blogService.getTrendingBlogs();
+    }
+
+    @Get('latest')
+@ApiOperation({ summary: 'Get latest blog posts' })
+@ApiResponse({ status: 200, description: 'Returns latest blog posts', type: [Blog] })
+async getLatestBlogs() {
+    return this.blogService.getLatestBlogs();
+}
+
 }

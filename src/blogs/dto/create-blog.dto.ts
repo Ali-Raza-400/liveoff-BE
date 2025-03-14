@@ -33,4 +33,8 @@ export class CreateBlogDto {
     @ApiProperty({ description: 'Category ID of the blog post' })
     @IsUUID()
     categoryId: string;
+
+    @ApiProperty({ description: 'Author ID of the blog post' })
+    @IsUUID()
+    author: string;
 }
