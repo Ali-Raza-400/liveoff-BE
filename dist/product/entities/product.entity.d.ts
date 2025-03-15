@@ -1,0 +1,30 @@
+import { Store } from '../../store/entities/store.entity';
+import { User } from '../../user/entities/user.entity';
+import { Coupon } from '../../coupon/entities/coupon.entity';
+import { Category } from 'src/category/entities/category.entity';
+export declare class Product {
+    id: string;
+    storeId: string;
+    name: string;
+    heading: string;
+    oldPrice: number;
+    currentPrice: number;
+    detail: string;
+    imageUrl: string;
+    htmlUrl: string;
+    category: string;
+    sku: string;
+    size: string;
+    color: string;
+    material: string;
+    isFeatured: boolean;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: string;
+    store: Store;
+    user: User;
+    coupons: Coupon[];
+    categoryEntity: Category;
+    categoryId: string;
+}

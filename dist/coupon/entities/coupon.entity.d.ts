@@ -1,0 +1,35 @@
+import { User } from '../../user/entities/user.entity';
+import { Store } from '../../store/entities/store.entity';
+import { Product } from '../../product/entities/product.entity';
+import { Category } from 'src/category/entities/category.entity';
+import { Event } from 'src/events/entities/event.entity';
+export declare class Coupon {
+    id: string;
+    name: string;
+    detail: string;
+    code: string;
+    htmlCodeUrl: string;
+    startDate: Date;
+    endDate: Date;
+    category: string;
+    rank: number;
+    isFreeShipping: boolean;
+    isExclusive: boolean;
+    isVerified: boolean;
+    showOnHomePage: boolean;
+    isTopCategory: boolean;
+    mainImage: string;
+    secondaryImage: string;
+    codeImage: string;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    storeId: string;
+    userId: string;
+    store: Store;
+    user: User;
+    products: Product[];
+    categoryEntity: Category;
+    categoryId: string;
+    events: Event[];
+}
