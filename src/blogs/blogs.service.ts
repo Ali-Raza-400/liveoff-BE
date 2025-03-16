@@ -18,20 +18,22 @@ export class BlogsService {
         private readonly userRepository: Repository<User>,
     ) {}
 
-    async create(createBlogDto: CreateBlogDto): Promise<Blog> {
+    async create(createBlogDto: CreateBlogDto, userid: any): Promise<any> {
+        console.log("Req:::",userid);
+        
         const category = await this.categoryRepository.findOne({ where: { id: createBlogDto.categoryId } });
         if (!category) throw new NotFoundException('Category not found');
     
-        const author = await this.userRepository.findOne({ where: { id: createBlogDto.author } });
+        const author = await this.userRepository.findOne({ where: { id: userid } });
         if (!author) throw new NotFoundException('Author not found');
     
         const blog = this.blogRepository.create({
             ...createBlogDto,
             category,
-            author: Promise.resolve(author), // 👈 Wrap author in Promise.resolve()
+            author: { id: author.id } as any, // Assign only the author id
         });
     
-        return this.blogRepository.save(await blog); // 👈 Await before saving
+        return this.blogRepository.save(blog); // 👈 Save the blog
     }
     
 
@@ -42,6 +44,8 @@ export class BlogsService {
     async findOne(id: string): Promise<Blog> {
         const blog = await this.blogRepository.findOne({ where: { id }, relations: ['category', 'author'] });
         if (!blog) throw new NotFoundException('Blog not found');
+        console.log("blog:::",blog);
+        
         return blog;
     }
 

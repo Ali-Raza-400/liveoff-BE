@@ -34,7 +34,8 @@ export class CreateBlogDto {
     @IsUUID()
     categoryId: string;
 
-    @ApiProperty({ description: 'Author ID of the blog post' })
+    @ApiProperty({ description: 'Author ID of the blog post', required: false })
+    @IsOptional() // ✅ Correct annotation
     @IsUUID()
-    author: string;
+    author?: string;
 }

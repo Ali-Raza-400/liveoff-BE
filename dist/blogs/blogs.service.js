@@ -28,19 +28,20 @@ let BlogsService = class BlogsService {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
     }
-    async create(createBlogDto) {
+    async create(createBlogDto, userid) {
+        console.log("Req:::", userid);
         const category = await this.categoryRepository.findOne({ where: { id: createBlogDto.categoryId } });
         if (!category)
             throw new common_1.NotFoundException('Category not found');
-        const author = await this.userRepository.findOne({ where: { id: createBlogDto.author } });
+        const author = await this.userRepository.findOne({ where: { id: userid } });
         if (!author)
             throw new common_1.NotFoundException('Author not found');
         const blog = this.blogRepository.create({
             ...createBlogDto,
             category,
-            author: Promise.resolve(author),
+            author: { id: author.id },
         });
-        return this.blogRepository.save(await blog);
+        return this.blogRepository.save(blog);
     }
     async findAll() {
         return this.blogRepository.find({ relations: ['category', 'author'] });
@@ -49,6 +50,7 @@ let BlogsService = class BlogsService {
         const blog = await this.blogRepository.findOne({ where: { id }, relations: ['category', 'author'] });
         if (!blog)
             throw new common_1.NotFoundException('Blog not found');
+        console.log("blog:::", blog);
         return blog;
     }
     async update(id, updateBlogDto) {

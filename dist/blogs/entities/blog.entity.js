@@ -95,7 +95,7 @@ __decorate([
 ], Blog.prototype, "updatedAt", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'User who created the blog' }),
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.blogs, { lazy: true, nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.blogs, { lazy: true, nullable: true }),
     __metadata("design:type", Promise)
 ], Blog.prototype, "author", void 0);
 exports.Blog = Blog = __decorate([

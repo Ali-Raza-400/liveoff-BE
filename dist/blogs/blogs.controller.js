@@ -19,13 +19,15 @@ const create_blog_dto_1 = require("./dto/create-blog.dto");
 const update_blog_dto_1 = require("./dto/update-blog.dto");
 const swagger_1 = require("@nestjs/swagger");
 const blog_entity_1 = require("./entities/blog.entity");
+const jwt_auth_guard_1 = require("../guards/jwt-auth.guard");
 let BlogController = class BlogController {
     blogService;
     constructor(blogService) {
         this.blogService = blogService;
     }
-    create(createBlogDto) {
-        return this.blogService.create(createBlogDto);
+    create(createBlogDto, req) {
+        console.log("createBlogDto:::===>", createBlogDto);
+        return this.blogService.create(createBlogDto, req.user.id);
     }
     findAll() {
         return this.blogService.findAll();
@@ -55,11 +57,14 @@ let BlogController = class BlogController {
 exports.BlogController = BlogController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new blog post' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Blog post created successfully', type: blog_entity_1.Blog }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_blog_dto_1.CreateBlogDto]),
+    __metadata("design:paramtypes", [create_blog_dto_1.CreateBlogDto, Object]),
     __metadata("design:returntype", void 0)
 ], BlogController.prototype, "create", null);
 __decorate([

@@ -55,6 +55,6 @@ export class Blog {
     updatedAt: Date;
 
     @ApiProperty({ description: 'User who created the blog' })
-    @ManyToOne(() => User, (user) => user.blogs, { lazy: true, nullable: false }) // Lazy relation
+    @ManyToOne(() => User, (user) => user.blogs, { lazy: true, nullable: true }) // Lazy relation
     author: Promise<User>;
 }

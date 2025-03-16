@@ -6,5 +6,5 @@ export declare class CreateBlogDto {
     isFeatured?: boolean;
     isTrending?: boolean;
     categoryId: string;
-    author: string;
+    author?: string;
 }

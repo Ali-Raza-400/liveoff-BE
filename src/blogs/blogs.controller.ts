@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Patch, Param, Delete, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Delete, Body, Request, UseGuards } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { Blog } from './entities/blog.entity';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @ApiTags('blogs')
 @Controller('blogs')
@@ -11,10 +12,14 @@ export class BlogController {
     constructor(private readonly blogService: BlogsService) { }
 
     @Post()
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Create a new blog post' })
     @ApiResponse({ status: 201, description: 'Blog post created successfully', type: Blog })
-    create(@Body() createBlogDto: CreateBlogDto) {
-        return this.blogService.create(createBlogDto);
+    create(@Body() createBlogDto: CreateBlogDto, @Request() req) {
+        console.log("createBlogDto:::===>", createBlogDto);
+
+        return this.blogService.create(createBlogDto, req.user.id);
     }
 
     @Get()
@@ -66,10 +71,10 @@ export class BlogController {
     }
 
     @Get('latest')
-@ApiOperation({ summary: 'Get latest blog posts' })
-@ApiResponse({ status: 200, description: 'Returns latest blog posts', type: [Blog] })
-async getLatestBlogs() {
-    return this.blogService.getLatestBlogs();
-}
+    @ApiOperation({ summary: 'Get latest blog posts' })
+    @ApiResponse({ status: 200, description: 'Returns latest blog posts', type: [Blog] })
+    async getLatestBlogs() {
+        return this.blogService.getLatestBlogs();
+    }
 
 }

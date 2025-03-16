@@ -63,7 +63,8 @@ __decorate([
     __metadata("design:type", String)
 ], CreateBlogDto.prototype, "categoryId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Author ID of the blog post' }),
+    (0, swagger_1.ApiProperty)({ description: 'Author ID of the blog post', required: false }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], CreateBlogDto.prototype, "author", void 0);

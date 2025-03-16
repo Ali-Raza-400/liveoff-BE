@@ -5,7 +5,7 @@ import { Blog } from './entities/blog.entity';
 export declare class BlogController {
     private readonly blogService;
     constructor(blogService: BlogsService);
-    create(createBlogDto: CreateBlogDto): Promise<Blog>;
+    create(createBlogDto: CreateBlogDto, req: any): Promise<any>;
     findAll(): Promise<Blog[]>;
     getFeaturedBlogs(): Promise<Blog[]>;
     setFeaturedBlog(id: string, { isFeatured }: {

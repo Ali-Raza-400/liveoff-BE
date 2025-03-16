@@ -9,7 +9,7 @@ export declare class BlogsService {
     private readonly categoryRepository;
     private readonly userRepository;
     constructor(blogRepository: Repository<Blog>, categoryRepository: Repository<Category>, userRepository: Repository<User>);
-    create(createBlogDto: CreateBlogDto): Promise<Blog>;
+    create(createBlogDto: CreateBlogDto, userid: any): Promise<any>;
     findAll(): Promise<Blog[]>;
     findOne(id: string): Promise<Blog>;
     update(id: string, updateBlogDto: UpdateBlogDto): Promise<Blog>;
