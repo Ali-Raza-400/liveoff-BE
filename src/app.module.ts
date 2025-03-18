@@ -11,9 +11,11 @@ import { NetworkModule } from './network/network.module';
 import { CategoryModule } from './category/category.module';
 import { BlogModule } from './blogs/blogs.module';
 import { EventsModule } from './events/events.module';
+import { PrivacyPolicyModule } from './privacy-policy/privacy-policy.module';
+import { TermsAndConditionModule } from './terms-and-condition/terms-and-condition.module';
 
 @Module({
-  imports: [UserModule,DatabaseModule, ConfigModule.forRoot({ isGlobal: true }), StoreModule, ProductModule, CouponModule, NetworkModule, CategoryModule, BlogModule, EventsModule,],
+  imports: [UserModule,DatabaseModule, ConfigModule.forRoot({ isGlobal: true }), StoreModule, ProductModule, CouponModule, NetworkModule, CategoryModule, BlogModule, EventsModule, PrivacyPolicyModule, TermsAndConditionModule,],
   controllers: [AppController],
   providers: [AppService],
 })
