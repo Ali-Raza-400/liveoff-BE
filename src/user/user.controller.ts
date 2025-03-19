@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UnauthorizedException, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UnauthorizedException, Req, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,6 +10,7 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/guards/role.guard';
 import { UserRole } from './enums/role.enum';
 import { Roles } from 'src/custom-decorators/role_decorator';
+import { UserQueryDto } from './dto/user-query.dto';
 
 @ApiTags('User Management')
 @Controller('users')
@@ -46,7 +47,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get your own profile by ID (protected)' })
   @ApiResponse({ status: 200, description: 'Profile fetched successfully' })
   async getProfile(@Param('id') id: string, @Req() req: any) {
-    console.log("req::::",req.user ,id)
+    console.log("req::::", req.user, id)
     const user = req.user; // This comes from the decoded JWT token
 
     if (user.id !== id) {
@@ -57,10 +58,14 @@ export class UserController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
-  findAll() {
-    return this.userService.findAll();
+  @ApiOperation({ summary: 'Get all users with optional search and pagination' })
+  @ApiResponse({ status: 200, description: 'List of users with metadata' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'name', required: false, type: String, example: 'John' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  findAll(@Query() query: UserQueryDto) {
+    return this.userService.findAll(query.page, query.limit, query.name);
   }
 
   @Patch(':id')
@@ -72,9 +77,9 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
-  
+
   @Delete(':id')
-  @ApiBearerAuth() 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete user by ID (admin only)' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden - Only admin can delete users' })
@@ -83,7 +88,7 @@ export class UserController {
   async deleteUser(@Param('id') id: string) {
     return this.userService.remove(id);
   }
-  
+
   //get user count 
   @Get('stats/count')
   // @ApiBearerAuth() 

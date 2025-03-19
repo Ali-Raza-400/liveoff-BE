@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -58,7 +58,7 @@ export class UserService {
 
     return {
       accessToken, email: user.email, role: user.role, fullName: user.name,
-      isActive: user.isActive,userId:user.id,user_permissions:user.permissions,
+      isActive: user.isActive, userId: user.id, user_permissions: user.permissions,
     };
   }
 
@@ -67,12 +67,35 @@ export class UserService {
     return { message: 'User logged out successfully' };
   }
 
-  async findAll() {
-    const users = await this.userRepository.find();
-    if (users.length === 0) {
-      throw new NotFoundException('No users found');
-    }
-    return users;
+  async findAll(page: number = 1, limit: number = 10, search?: string) {
+    const whereCondition = search
+      ? [
+        { name: ILike(`%${search}%`) }, // Case-insensitive search on name
+        { email: ILike(`%${search}%`) }, // Case-insensitive search on email
+      ]
+      : {}; // If no search, return all users
+
+    const [users, totalRecords] = await this.userRepository.findAndCount({
+      where: whereCondition,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return {
+      statusCode: 200, // Keep it 200 even if no users found
+      message: users.length ? 'Users retrieved successfully' : 'No users found',
+      data: users, // Return an empty array if no records are found
+      metadata: {
+        totalRecords,
+        itemsPerPage: limit,
+        currentPage: page,
+        nextPage: page < totalPages ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string) {
@@ -105,8 +128,8 @@ export class UserService {
     return { message: `User with id ${id} deleted successfully` };
   }
 
-    async getUserCount() {
-      const count = await this.userRepository.count();
-      return { count };
-    }
+  async getUserCount() {
+    const count = await this.userRepository.count();
+    return { count };
+  }
 }
