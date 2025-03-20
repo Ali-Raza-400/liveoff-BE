@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -36,6 +36,36 @@ export class ProductService {
       relations: ['store', 'user'],
     });
   }
+
+  async findAllProductBySearch(page: number = 1, limit: number = 10, search?: string) {
+    const whereCondition = search
+      ? { name: ILike(`%${search}%`) } // Case-insensitive search on product name
+      : {}; // If no search, return all products
+  
+    const [products, totalRecords] = await this.productRepository.findAndCount({
+      where: whereCondition,
+      relations: ['store', 'user'],
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  
+    const totalPages = Math.ceil(totalRecords / limit);
+  
+    return {
+      statusCode: 200,
+      message: products.length ? 'Products retrieved successfully' : 'No products found',
+      data: products,
+      metadata: {
+        totalRecords,
+        itemsPerPage: limit,
+        currentPage: page,
+        nextPage: page < totalPages ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        totalPages,
+      },
+    };
+  }
+  
 
   async findAllByStore(storeId: string): Promise<Product[]> {
     return this.productRepository.find({

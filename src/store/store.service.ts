@@ -27,7 +27,62 @@ export class StoreService {
       relations: ['user'],
     });
   }
-
+  async findAllWithSearch(filters?: {
+    name?: string;
+    isActive?: boolean;
+    networkId?: string;
+    categoryId?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<any> {
+    const query = this.storeRepository.createQueryBuilder('store')
+      .leftJoinAndSelect('store.user', 'user');
+  
+    if (filters?.name) {
+      query.andWhere('store.name ILIKE :name', { name: `%${filters.name}%` });
+    }
+    
+    if (filters?.isActive !== undefined) {
+      query.andWhere('store.isActive = :isActive', { isActive: filters.isActive });
+    }
+  
+    if (filters?.networkId) {
+      query.andWhere('store.networkId = :networkId', { networkId: filters.networkId });
+    }
+  
+    if (filters?.categoryId) {
+      query.andWhere('store.categoryId = :categoryId', { categoryId: filters.categoryId });
+    }
+  
+    // Pagination setup
+    const page = filters?.page ? Number(filters.page) : 1;
+    const limit = filters?.limit ? Number(filters.limit) : 10;
+    const offset = (page - 1) * limit;
+  
+    const [data, totalRecords] = await query
+      .skip(offset)
+      .take(limit)
+      .getManyAndCount();
+  
+    const totalPages = Math.ceil(totalRecords / limit);
+    const nextPage = page < totalPages ? page + 1 : null;
+    const prevPage = page > 1 ? page - 1 : null;
+  
+    return {
+      statusCode: 200,
+      message: 'Stores retrieved successfully',
+      data,
+      metadata: {
+        totalRecords,
+        itemsPerPage: limit,
+        currentPage: page,
+        nextPage,
+        prevPage,
+        totalPages,
+      },
+    };
+  }
+  
   async findAllByUser(userId: string): Promise<Store[]> {
     return this.storeRepository.find({
       where: { userId },

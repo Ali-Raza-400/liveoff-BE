@@ -47,6 +47,32 @@ export class CouponController {
     return this.couponService.findAll(storeId, isActive, category, isVerified);
   }
 
+  @Get('/search')
+  @ApiOperation({ summary: 'Get all coupons with optional filters and search' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all coupons matching the criteria with metadata.',
+    type: [CouponResponseDto],
+  })
+  @ApiQuery({ name: 'storeId', required: false, description: 'Filter by store ID' })
+  @ApiQuery({ name: 'isActive', required: false, description: 'Filter by active status' })
+  @ApiQuery({ name: 'category', required: false, description: 'Filter by category' })
+  @ApiQuery({ name: 'isVerified', required: false, description: 'Filter by verification status' })
+  @ApiQuery({ name: 'name', required: false, description: 'Search by name or detail' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number for pagination', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Limit per page for pagination', type: Number })
+  async findAllCouponBySearch(
+    @Query('storeId') storeId?: string,
+    @Query('isActive') isActive?: boolean,
+    @Query('category') category?: string,
+    @Query('isVerified') isVerified?: boolean,
+    @Query('name') name?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.couponService.findAllCouponBySearch(storeId, isActive, category, isVerified, name, page, limit);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a coupon by ID' })
   @ApiResponse({ 

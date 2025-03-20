@@ -90,6 +90,68 @@ export class CouponService {
     return coupons.map(coupon => CouponResponseDto.fromEntity(coupon));
   }
 
+
+
+  async findAllCouponBySearch(
+    storeId?: string,
+    isActive?: boolean,
+    category?: string,
+    isVerified?: boolean,
+    search?: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const queryBuilder = this.couponRepository.createQueryBuilder('coupon')
+      .leftJoinAndSelect('coupon.store', 'store')
+      .leftJoinAndSelect('coupon.products', 'products');
+
+    // Apply filters if provided
+    if (storeId) {
+      queryBuilder.andWhere('coupon.storeId = :storeId', { storeId });
+    }
+
+    if (isActive !== undefined) {
+      queryBuilder.andWhere('coupon.isActive = :isActive', { isActive });
+    }
+
+    if (category) {
+      queryBuilder.andWhere('coupon.category = :category', { category });
+    }
+
+    if (isVerified !== undefined) {
+      queryBuilder.andWhere('coupon.isVerified = :isVerified', { isVerified });
+    }
+
+    // Apply search filter on coupon name
+    if (search) {
+      queryBuilder.andWhere('LOWER(coupon.name) LIKE LOWER(:search)', { search: `%${search}%` });
+    }
+
+    // Get total count before pagination
+    const totalRecords = await queryBuilder.getCount();
+    const totalPages = Math.ceil(totalRecords / limit);
+    const offset = (page - 1) * limit;
+
+    queryBuilder.skip(offset).take(limit);
+
+    // Order by rank and creation date
+    queryBuilder.orderBy('coupon.rank', 'DESC').addOrderBy('coupon.createdAt', 'DESC');
+
+    const coupons = await queryBuilder.getMany();
+
+    return {
+      data: coupons.map((coupon) => CouponResponseDto.fromEntity(coupon)),
+      metadata: {
+        totalRecords,
+        itemsPerPage: limit.toString(),
+        currentPage: page.toString(),
+        nextPage: page < totalPages ? (page + 1).toString() : null,
+        prevPage: page > 1 ? (page - 1).toString() : null,
+        totalPages: totalPages.toString(),
+      },
+    };
+  }
+
   async findOne(id: string): Promise<CouponResponseDto> {
     const coupon = await this.couponRepository.findOne({
       where: { id },

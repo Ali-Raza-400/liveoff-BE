@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, Query } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
@@ -43,6 +43,24 @@ export class StoreController {
   @ApiResponse({ status: 403, description: 'Forbidden - requires admin role.' })
   findAll() {
     return this.storeService.findAll();
+  }
+
+  @Get('/search')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all stores with optional filters & pagination (admin only)' })
+  @ApiResponse({ status: 200, description: 'Returns stores with metadata.', type: [Store] })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden - requires admin role.' })
+  findAllWithSearch(
+    @Query('name') name?: string,
+    @Query('isActive') isActive?: boolean,
+    @Query('networkId') networkId?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10
+  ) {
+    return this.storeService.findAllWithSearch({ name, isActive, networkId, categoryId, page, limit });
   }
 
   @Get('my-stores')

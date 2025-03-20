@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -44,6 +44,22 @@ export class ProductController {
   findAll() {
     return this.productService.findAll();
   }
+
+  @Get('/search')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all products with optional search and pagination (admin only)' })
+  @ApiResponse({ status: 200, description: 'List of products with metadata' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden - requires admin role.' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'name', required: false, type: String, example: 'Electric Guitar' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  findAllProductBySearch(@Query() query: { page?: number; limit?: number; name?: string }) {
+    return this.productService.findAllProductBySearch(query.page, query.limit, query.name);
+  }
+
 
   @Get('my-products')
   @UseGuards(JwtAuthGuard)
