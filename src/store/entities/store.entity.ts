@@ -6,6 +6,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Network } from 'src/network/entities/network.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Event } from 'src/events/entities/event.entity';
+import { Code } from 'src/code/entities/code.entity';
 
 // Define a class for FAQ items
 export class FAQ {
@@ -262,6 +263,9 @@ export class Store {
     @ApiProperty({ description: 'List of events this store is part of' })
     @ManyToMany(() => Event, (event) => event.stores)
     events: Event[];
+
+    @OneToMany(() => Code, (code) => code.store, { nullable: true })
+    codes?: Code[];
 
 
 }

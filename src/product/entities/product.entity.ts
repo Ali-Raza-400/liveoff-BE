@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, ManyToMany, OneToMany } from 'typeorm';
 import { Store } from '../../store/entities/store.entity';
 import { User } from '../../user/entities/user.entity';
 import { Coupon } from '../../coupon/entities/coupon.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
+import { Code } from 'src/code/entities/code.entity';
 
 @Entity()
 export class Product {
@@ -166,5 +167,8 @@ export class Product {
 
     @Column({ nullable: true })
     categoryId: string;
+
+    @OneToMany(() => Code, (code) => code.product, { nullable: true })
+    codes?: Code[];
 
 }

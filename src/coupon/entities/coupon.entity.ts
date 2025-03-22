@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Store } from '../../store/entities/store.entity';
 import { Product } from '../../product/entities/product.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
 import { Event } from 'src/events/entities/event.entity';
+import { Code } from 'src/code/entities/code.entity';
 
 @Entity()
 export class Coupon {
@@ -200,5 +201,9 @@ export class Coupon {
 
     @ManyToMany(() => Event, (event) => event.coupons)
     events: Event[];
+
+    @OneToOne(() => Code, (code) => code.coupon, { nullable: true, onDelete: "SET NULL" })
+    @JoinColumn()
+    codes?: Code;
 
 }
